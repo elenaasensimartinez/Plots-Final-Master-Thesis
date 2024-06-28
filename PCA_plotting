@@ -25,3 +25,39 @@ pca = ggplot(data = pca.vectors, aes(x=X1, y=X2, colour = Population, shape = Li
   guides(shape = guide_legend(title = "Type")) labs(title = "PCA with all samples") + theme(plot.title = element_text(hjust = 0.5, size = 20))
 print (pca)
 
+
+
+
+
+                                                                                      ### with eastern samples ###
+library(tidyverse)
+library(ggrepel)
+
+basedir <- "/Users/elenaasensimartinez/Downloads"
+cov <- as.matrix(read.table(paste0(basedir, "/EEP_Easterns.cov"), header = F))
+ID<-read.table("/Users/elenaasensimartinez/Downloads/ids_eastern",head=F)
+Population = ID[[2]]
+id = ID[[1]]
+mme.pca <- eigen(cov)
+pca.vectors$id <- id
+eigenvectors = mme.pca$vectors
+pca.vectors = as_tibble(cbind(Population, data.frame(eigenvectors)))
+
+#Calculate variance explained per PC
+eigenvalues <- mme.pca$values
+variance_explained <- eigenvalues / sum(eigenvalues) * 100
+pc1 <- cov %*% eigenvectors[, 1]
+pc2 <- cov %*% eigenvectors[, 2]
+round(variance_explained[1], 2)
+round(variance_explained[2], 2)
+
+pca = ggplot(data = pca.vectors, aes(x=X1, y=X2, colour = Population)) + geom_point(shape =16, size = 3) + labs(x = "PC1 (36.61%)", y = "PC2 (5.65%)") + scale_color_manual(values = c("olivedrab", "yellowgreen")) + labs(title = "PCA with eastern samples") + theme(plot.title = element_text(hjust = 0.5, size = 20)) +   theme(
+  plot.title = element_text(hjust = 0.5, size = 20, family = "Times New Roman"),
+  axis.title.x = element_text(family = "Times New Roman", size=15),
+  axis.title.y = element_text(family = "Times New Roman", size=15),
+  axis.text = element_text(family = "Times New Roman"),
+  legend.title = element_text(family = "Times New Roman", size=15),
+  legend.text = element_text(family = "Times New Roman", size=15)
+) + 
+  geom_text(aes(label = id), vjust = 0.3, hjust = 0.5, size = 1.5)
+print(pca)
