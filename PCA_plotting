@@ -1,0 +1,27 @@
+                                                                                        ### with all samples ###
+
+library(tidyverse)
+library(ggplot)
+
+basedir <- "/Users/elenaasensimartinez/Downloads"
+cov <- as.matrix(read.table(paste0(basedir, "/EEP_ALL_merged_downsampled.cov"), header = F))
+ID<-read.table("/Users/elenaasensimartinez/Downloads/list_ind_pop_DEF.txt",head=F)
+Population = ID[[2]]
+Living= ID[[3]]
+id = ID[[1]]
+
+#Calculate variance explained per PC
+eigenvalues <- mme.pca$values
+variance_explained <- eigenvalues / sum(eigenvalues) * 100
+pc1 <- cov %*% eigenvectors[, 1]
+pc2 <- cov %*% eigenvectors[, 2]
+round(variance_explained[1], 2)
+round(variance_explained[2], 2)
+
+mme.pca <- eigen(cov)
+eigenvectors = mme.pca$vectors
+pca.vectors = as_tibble(cbind(Population, data.frame(eigenvectors)))
+pca = ggplot(data = pca.vectors, aes(x=X1, y=X2, colour = Population, shape = Living)) + geom_point(shape =16, size = 3) + labs(x = "PC1 (15,05%)", y = "PC2 (4,54%)") + scale_color_manual(values = c("darkblue", "olivedrab","yellowgreen","skyblue")) + scale_shape_manual(values = c("Captive" = 17, "Wild" = 16)) +  
+  guides(shape = guide_legend(title = "Type")) labs(title = "PCA with all samples") + theme(plot.title = element_text(hjust = 0.5, size = 20))
+print (pca)
+
